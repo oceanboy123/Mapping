@@ -38,9 +38,6 @@ class Mapping:
         8: 'No map Intent',
     }
 
-    demoted_scores = []
-    demotion_reason = []
-    resulting_scores = []
     history = []
 
 
@@ -239,20 +236,6 @@ class Mapping:
 
 
 
-    # def demotion(self, score, demoted, demotion_comment, demotion = 1) -> int:
-    #     self.demotion_reason.append(demotion_comment)
-    #     self.demoted_scores.append(demoted)
-        
-    #     if score == 1:
-    #         pass
-    #     else:
-    #         score -= demotion
-    #         if score < 1:
-    #             score = 1
-
-    #     self.resulting_scores.append(score)
-        
-    #     return score
     
     def no_other_options(self) -> None:
         self.comment_options = self.boolean[int(input('----Are there any better results not shown? \n\n1. Yes \n2. No '))]
