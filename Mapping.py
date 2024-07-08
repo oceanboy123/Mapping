@@ -64,13 +64,13 @@ class Mapping:
 
     def infinite_blank_check(self, loc_intents:list[str], self_iter, left_side:str, reason:str) -> str:
         '''In-Progress'''
-        rep = len(loc_intents)
+        rep = len(loc_intents) + 1
         lap = 1
 
         while lap != rep:
             if self_iter == lap:
                 self_comment = loc_intents[lap-1]
-            lap =+ 1
+            lap += 1
 
         self.save_comments(left_side, self_comment, reason)
         
@@ -106,64 +106,63 @@ class Mapping:
 
 
     def explicit_location(self, left_side:str) -> None:
-        self.explicit_intent = int(input('----Select Explicit Intent \n\n1. Specific Location, \n2. Near me'))
+        self.explicit_intent = int(input('\n----Select Explicit Intent \n\n1. Specific Location, \n2. Near me \n\nAnswer:     '))
         reason = ['Specific Location',
                   'Near me']
-        
-        left_side = 'Viewpoint - Location Intent'
 
         str_list = ['Ignore User and Viewpoint Location',
                     'User Location']
         
-        self.comment_location_intent = self.infinite_blank_check(str_list, self.explicit_intent, left_side, reason[self.explicit_intent]+' Query')
+        self.comment_location_intent = self.infinite_blank_check(str_list, self.explicit_intent, left_side, reason[self.explicit_intent-1]+' Query')
 
 
     def implicit_location(self) -> None:
-        self.viewport_type = int(input('----Select Viewport type \n\n1. Fresh, \n2. Stale, \n3. Age Missing, \n4. Missing'))
+        self.viewport_type = int(input('\n----Select Viewport type \n\n1. Fresh, \n2. Stale, \n3. Age Missing, \n4. Missing \n\nAnswer:     '))
         viewport_type = ['Fresh', 
                          'Stale', 
                          'Age Missing', 
                          'Missing']
         
-        left_side = f'{viewport_type[self.viewport_type] + ' Viewpoint - Location Intent'}'
+        left_side = f'{viewport_type[self.viewport_type]}' + ' Viewpoint - Location Intent'
 
         if self.viewport_type < 3:
-            self.user_location = int(input('----Select User Location \n\n1. Inside Viewport, \n2. Outside Viewport, \n3. Missing'))
+            self.user_location = int(input('\n----Select User Location \n\n1. Inside Viewport, \n2. Outside Viewport, \n3. Missing \n\nAnswer:     '))
             reason = ['Inside Viewport',
                       'Outside Viewport',
                       'Missing']
 
             if self.viewport_type == 1:
-                self.fresh_viewport(left_side, reason[self.user_location])
+                self.fresh_viewport(left_side, reason[self.user_location-1])
             elif self.viewport_type == 2:
-                self.stale_viewport(left_side, reason[self.user_location])
+                self.stale_viewport(left_side, reason[self.user_location-1])
 
         else:
-            self.user_location = int(input('----Select User Location \n\n1. Present, \n2. Missing'))
+            self.user_location = int(input('\n----Select User Location \n\n1. Present, \n2. Missing \n\nAnswer:     '))
             reason = ['Present',
                       'Missing']
 
             if self.viewport_type == 3:
-                self.fresh_viewport(left_side, reason[self.user_location])
+                self.fresh_viewport(left_side, reason[self.user_location-1])
             elif self.viewport_type == 4:
-                self.missing_viewport(left_side, reason[self.user_location])
+                self.missing_viewport(left_side, reason[self.user_location-1])
 
 
     def get_query_type(self) -> None:
-        self.query_type = int(input('----Select Queary Type \n\n1. Address(street number, street name, locality, state, country, and postal code), \n2. Point of Interest(POI), \n3. Business, \n4. Category, \n5. Products and Service, \n6. Coordinates or My location, \n7. Emoji, \n8. No map Intent'))
-        self.comment_query_type = self.query_types[self.query_type]
+        self.query_type = int(input('\n----Select Queary Type \n\n1. Address(street number, street name, locality, state, country, and postal code), \n2. Point of Interest(POI), \n3. Business, \n4. Category, \n5. Products and Service, \n6. Coordinates or My location, \n7. Emoji, \n8. No map Intent \n\nAnswer:     '))
+        self.comment_query_type = self.Query_types[self.query_type]
         reason = 'N/A'
         self.save_comments('Query Type', self.comment_query_type, reason)
 
 
     def get_location_intent(self) -> None:
-        self.location_type = int(input('----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific)'))
+        self.location_type = int(input('\n----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific) \n\nAnswer:     '))
         
         if self.location_type == 2:
             self.implicit_location()
 
         elif self.location_type == 1:
-            self.explicit_location()
+            left_side = 'Viewpoint - Location Intent'
+            self.explicit_location(left_side)
 
 
     def user_intent(self) -> None:
@@ -183,37 +182,37 @@ class Mapping:
 
     boolean = ['n/a', True, False]
     def navigational(self) -> None:
-        self.comment_navigation  = self.boolean[int(input('----Is this a Navigational Intent? \nThe intent is unique and clear enough that there is only a single result in the world \n\n1. Yes \n2. No'))]
+        self.comment_navigation  = self.boolean[int(input('\n----Is this a Navigational Intent? \nThe intent is unique and clear enough that there is only a single result in the world \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'The intent is unique and clear enough that there is only a single result in the world'
         if self.comment_navigation  == False:
             self.relevance_score = 4
             reason = 'The intent is NOT unique and clear enough that there is only a single result in the world'
 
-        self.save_comments('Navigational', self.comment_navigation, reason)
+        self.save_comments('Navigational', str(self.comment_navigation), reason)
 
 
     def language_test(self) -> None:
-        self.comment_language = self.boolean[int(input('----Is the language matching for test_locale, query, and result region? \n\n1. Yes \n2. No'))]
+        self.comment_language = self.boolean[int(input('\n----Is the language matching for test_locale, query, and result region? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'N/A'
         if self.comment_language == False:
             self.address_score = 1
 
-        self.save_comments('Language Match', self.comment_language, reason)
+        self.save_comments('Language Match', str(self.comment_language), reason)
 
 
     def closure_test(self) -> None:
-        self.comment_closure = self.boolean[int(input('----Is the status PERMANENT_CLOSURE? \n\n1. Yes \n2. No'))]
+        self.comment_closure = self.boolean[int(input('\n----Is the status PERMANENT_CLOSURE? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         if self.comment_closure:
-            exp = self.boolean[int(input('Is this result Expected? \nIt completely satisfies user intent or there are no other options? \n\n1. Yes \n2. No '))]
+            exp = self.boolean[int(input('\n----Is this result Expected? \nIt completely satisfies user intent or there are no other options? \n\n1. Yes \n2. No \n\nAnswer:     '))]
             if exp == False:
                 self.relevance_score = 2
                 left_side = 'Unexpected PERMANENT_CLOSURE'
                 reason = 'It does not satisfies user intent or there are no other options'
             else:
                 left_side = 'Expected PERMANENT_CLOSURE'
-                reason = 'It completely not satisfies user intent or there are no other options'
+                reason = 'It completely satisfies user intent or there are no other options'
 
-            self.save_comments(left_side, self.comment_closure, reason)
+            self.save_comments(left_side, str(self.comment_closure), reason)
 
 
     def all_level_issues(self) -> None:
@@ -238,31 +237,31 @@ class Mapping:
 
     
     def no_other_options(self) -> None:
-        self.comment_options = self.boolean[int(input('----Are there any better results not shown? \n\n1. Yes \n2. No '))]
+        self.comment_options = self.boolean[int(input('\n----Are there any better results not shown? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'N/A'
         if self.comment_options:
-            demotion_req = self.boolean[int(input('----Does it require demotion? \n\n1. Yes \n2. No '))]
+            demotion_req = self.boolean[int(input('\n----Does it require demotion? \n\n1. Yes \n2. No \n\nAnswer:     '))]
             if demotion_req:
-                amount = input('----How many points?')
+                amount = input('\n----How many points? \n\nAnswer:     ')
                 reason = f'There are missing options that fit the query better, relevance demoted {amount} points'
                 self.relevance_score = self.relevance_score - amount
 
         left_side = 'Other Options'
-        self.save_comments(left_side, self.comment_options, reason)
+        self.save_comments(left_side, str(self.comment_options), reason)
 
 
     def is_legal(self) -> None:
-        self.comment_legal = self.boolean[int(input('----Is it unexpectedly inappropriate? \n\n1. Yes \n2. No '))]
+        self.comment_legal = self.boolean[int(input('\n----Is it unexpectedly inappropriate? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason ='N/A'
         if self.comment_legal:
             self.relevance_score = 1
         
         left_side = 'Inappropriate results'
-        self.save_comments(left_side, self.comment_legal, reason)
+        self.save_comments(left_side, str(self.comment_legal), reason)
 
 
     def query_result_connection(self) -> None:
-        result_connection_test_p1 = int(input('----Does the connection satisfy intent? \nGeneral, Abbreviation/Alternate, Category, Spell Correction \nTransit, Special Character, Address? \n\n1. Yes \n2. No '))
+        result_connection_test_p1 = int(input('\n----Does the connection satisfy intent? \nGeneral, Abbreviation/Alternate, Category, Spell Correction \nTransit, Special Character, Address? \n\n1. Yes \n2. No \n\nAnswer:     '))
         conections = ['', 
                       'Address',
                       'Not Address']
@@ -270,16 +269,23 @@ class Mapping:
         reason = 'N/A'
 
         if result_connection_test_p1 == 1:
-            result_connection_test_p2 = int(input('----Is it address? \n\n1. Yes \n2. No '))
-            left_side = conections[result_connection_test_p2] + '' + left_side
+            result_connection_test_p2 = int(input('\n----Is it address? \n\n1. Yes \n2. No \n\nAnswer:     '))
+            left_side = conections[result_connection_test_p2-1] + ' ' + left_side
             
             if result_connection_test_p2 == 1:
-                result_connection_test_p3 = int(input('----What is missing? \n\n1. Unit Number \n2. Incomplete \n3. Wrong \n4. None'))
+                result_connection_test_p3 = int(input('\n----What is missing? \n\n1. Unit Number \n2. Incomplete \n3. Wrong \n4. None \n\nAnswer:     '))
                 str_list = ['Unit Number', 
                             'Incomplete', 
                             'Wrong', 
-                            'None']
+                            'All good']
                 
+                scores = [3,
+                          2,
+                          1,
+                          self.relevance_score]
+                
+                self.relevance_score = scores[result_connection_test_p3-1]
+                reason = f'of this the Current/Final Relevant Score is {self.Relevance_levels[self.relevance_score]}'
                 self.comment_connection = self.infinite_blank_check(str_list, result_connection_test_p3, left_side, reason)
 
             else:
@@ -295,7 +301,7 @@ class Mapping:
 
 
     def prominence(self) -> None:
-        result_prominence_test = int(input('----Should there be a promotion due to interantional prominence? \n\n1. Yes \n2. No '))
+        result_prominence_test = int(input('\n----Should there be a promotion due to interantional prominence? \n\n1. Yes \n2. No \n\nAnswer:     '))
         if result_prominence_test == 1:
             self.comment_prominence = 'International'
             self.relevance_score = 3
@@ -308,21 +314,21 @@ class Mapping:
     
 
     def distance(self) -> None:
-        result_many_test3 = int(input('----How far is the location from viewport? \n\n1. Near \n2. Near-ish \n3. Far-ish \n4. Far'))
+        result_many_test3 = int(input('\n----How far is the location from viewport? \n\n1. Near \n2. Near-ish \n3. Far-ish \n4. Far \n\nAnswer:     '))
         str_list = ['Near', 
                     'Near-ish', 
                     'Far-ish', 
                     'Far']
         
         scores = [999, 
-                  min(self.relevance_score,4), 
+                  self.relevance_score, 
                   min(self.relevance_score,3), 
                   min(self.relevance_score,2), 
                   min(self.relevance_score,1)]
         
         left_side = f'{self.relevance_type} Relevance'
         self.relevance_score = scores[result_many_test3]
-        reason = f'of this Relevance Score is {self.relevance_score}'
+        reason = f'of this Relevance Score is {self.Relevance_levels[self.relevance_score]}'
 
         self.comment_relevance = self.infinite_blank_check(str_list, result_many_test3, left_side, reason)
 
@@ -332,7 +338,7 @@ class Mapping:
 
         self.relevance_type = 'Many possible options'
         if self.user_location == 1:
-            result_many_test = int(input('----How far is the location from user? \n\n1. Near/In \n2. Near-ish/In \n3. Far/In \n4. Near/Out \n5. Far/Out'))
+            result_many_test = int(input('\n----How far is the location from user? \n\n1. Near/In \n2. Near-ish/In \n3. Far/In \n4. Near/Out \n5. Far/Out \n\nAnswer:     '))
             str_list = ['Near/In', 
                         'Near-ish/In', 
                         'Far/In', 
@@ -340,31 +346,31 @@ class Mapping:
                         'Far/Out']
             
             scores = [999, 
-                      min(self.relevance_score,4), 
+                      self.relevance_score, 
                       min(self.relevance_score,3), 
                       min(self.relevance_score,2), 
-                      min(self.relevance_score,4), 
+                      self.relevance_score, 
                       min(self.relevance_score,1)]
             
             left_side = f'{self.relevance_type} Relevance'
             self.relevance_score = scores[result_many_test]
-            reason = f'of this Relevance Score is {self.relevance_score}'
+            reason = f'of this Relevance Score is {self.Relevance_levels[self.relevance_score]}'
 
             self.comment_relevance = self.infinite_blank_check(str_list, result_many_test, left_side, reason)
 
         elif self.user_location == 2:
-            result_many_test2 = int(input('----Is the location in or out of the viewport? \n\n1. In \n2. Out '))
+            result_many_test2 = int(input('\n----Is the location in or out of the viewport? \n\n1. In \n2. Out \n\nAnswer:     '))
             str_list = [
                 'In', 
                 'Out']
             
             scores = [999,
-                      min(self.relevance_score,4), 
+                      self.relevance_score, 
                       min(self.relevance_score,1)]
             
             left_side = f'{self.relevance_type} Relevance'
             self.relevance_score = scores[result_many_test2]
-            reason = f'of this Relevance Score is {self.relevance_score}'
+            reason = f'of this Relevance Score is {self.Relevance_levels[self.relevance_score]}'
 
             self.comment_relevance = self.infinite_blank_check(str_list, result_many_test2, left_side, reason)
 
@@ -405,9 +411,8 @@ class Mapping:
         self.relevance_type = 'Deviations'
 
         if self.navigational == False:
-            result_deviation_test = int(input('----Is the location in the viewport, and near the user? \n\n1. Yes \n2. No '))
+            result_deviation_test = int(input('\n----Is the location in the viewport, and near the user? \n\n1. Yes \n2. No \n\nAnswer:     '))
             if result_deviation_test == 1:
-                self.relevance_score = 4
                 reason = 'It is in the viewport, and near the user'
             else:
                 self.relevance_score = 1
@@ -419,7 +424,8 @@ class Mapping:
 
     def other_types(self) -> None:
         self.relevance_type = 'String Relevance'
-        self.relevance_score = int(input('----Write score based on relationship between query and result'))
+        print(f'Current Relevance Score: {self.relevance_score}')
+        self.relevance_score = int(input('\n----Write score based on relationship between query and result \n\nAnswer:     '))
         reason = input('----Provide reason')
 
         left_side = f'{self.relevance_type} Relevance'
@@ -429,7 +435,7 @@ class Mapping:
     def relevance_tests(self) -> None:
         self.prominence()
         
-        relevance_method = int(input('----Choose Method \n\n1. Many Resuslts \n2. Few Results(FPR) \n3. FPR and Further \n4. Rural \n5. Deviations in Location \n6. String Issues '))
+        relevance_method = int(input('\n----Choose Method \n\n1. Many Resuslts \n2. Few Results(FPR) \n3. FPR and Further \n4. Rural \n5. Deviations in Location \n6. String Issues \n\nAnswer:     '))
 
         if relevance_method == 1:
             self.many_possible_results()
@@ -460,7 +466,8 @@ class Mapping:
         self.query_result_connection()
 
         # Evaluate Relevance
-        self.relevance_tests
+        if self.comment_connection == 'Not Address':
+            self.relevance_tests()
 
 
 
@@ -469,7 +476,7 @@ class Mapping:
 
 
     def check_name(self) -> None:
-        name_result = int(input('----Rate the name \n\n1. Correct \n2. Partially Correct (Mispell, Service Mismatches, Missing/Unnecesary additions) \n3. Incorrect (Unrecognizable) \n4. Cant Verify'))
+        name_result = int(input('\n----Rate the name \n\n1. Correct \n2. Partially Correct (Mispell, Service Mismatches, Missing/Unnecesary additions) \n3. Incorrect (Unrecognizable) \n4. Cant Verify \n\nAnswer:     '))
         
         str_list = ['Correct', 
                     'Partially Correct', 
@@ -490,7 +497,7 @@ class Mapping:
 
 
     def check_category(self) -> None:
-        category_result = int(input('----Is the category wrong, misleading, misspelled, incomplete or different language? \n\n1. Yes \n2. No \n3. n/a'))
+        category_result = int(input('\n----Is the category wrong, misleading, misspelled, incomplete or different language? \n\n1. Yes \n2. No \n3. n/a \n\nAnswer:     '))
         str_list = ['Incorrect', 
                     'Correct', 
                     'n/a']
@@ -517,8 +524,10 @@ class Mapping:
             self.name_category_score = 3
         elif (ns == 2 & cs == 3) | (ns == 2 & cs == -1):
             self.name_category_score = 2
+        elif (ns == 3 & cs == -1):
+            self.name_category_score = -1
         else:
-            self.name_category_score = int(input(f'----Name = {ns}, Category = {cs}. What is the score then?'))
+            self.name_category_score = int(input(f'\n----Name = {ns}, Category = {cs}. What is the score then? \n\nAnswer:     '))
 
         left_side = f'Combined Name-Category Rating'
         self.comment_name_category = self.Accuracy_levels[self.name_category_score]
@@ -536,12 +545,17 @@ class Mapping:
         ---self.comment_name_category---'''
 
         if self.comment_query_type == 'Address':
-            self.name_score = -1
+            address_name = self.boolean[int(input('\n----Does the address result include a name? \n\n1. Yes \n2. No \n3. n/a \n\nAnswer:     '))]
+            
+            if address_name == False:
+                self.name_score = -1
 
-            left_side = f'Name Rating'
-            reason = 'Query Type is Address'
-            self.comment_name = self.Accuracy_levels[self.name_score]
-            self.save_comments(left_side, self.comment_name, reason)
+                left_side = f'Name Rating'
+                reason = 'Query Type is Address'
+                self.comment_name = self.Accuracy_levels[self.name_score]
+                self.save_comments(left_side, self.comment_name, reason)
+            else:
+                self.check_name
         else:
             self.check_name
 
@@ -556,12 +570,13 @@ class Mapping:
 
     def address_components(self) -> None:
         self.comment_components = []
-        selection = int(input('----Check for the following address components \n\n1. Street #/Extensions/Ranges \n2. Unit/Apt \n3. St. Name/Alternate/Directions/Type \n4. Sub-locality \n5. Reggion/State \n6. Postal Code \n7. Country \n8. Exit'))
+        selection = int(input('\n----Check for the following address components based on result address \n\n1. Street #/Extensions/Ranges \n2. Unit/Apt \n3. St. Name/Alternate/Directions/Type \n4. Sub-locality \n5. Reggion/State \n6. Postal Code \n7. Country \n8. Exit \n\nAnswer:     '))
+        issues = ['Street #/Extensions/Ranges','Unit/Apt', 'St. Name/Alternate/Directions/Type' ,'Sub-locality' ,'Reggion/State' ,'Postal Code' ,'Country']
         while selection != 8:
-            self.comment_components.append(selection)
-            selection = int(input('----Check for the following address components \n\n1. Street #/Extensions/Ranges \n2. Unit/Apt \n3. St. Name/Alternate/Directions/Type \n4. Sub-locality \n5. Reggion/State \n6. Postal Code \n7. Country \n8. Exit'))
+            self.comment_components.append(issues[selection-1])
+            selection = int(input('\n----Check for the following address components based on result address \n\n1. Street #/Extensions/Ranges \n2. Unit/Apt \n3. St. Name/Alternate/Directions/Type \n4. Sub-locality \n5. Reggion/State \n6. Postal Code \n7. Country \n8. Exit \n\nAnswer:     '))
         
-        if not selection:
+        if not self.comment_components:
             self.address_score = 3
         else:
             self.address_score = 1
@@ -575,7 +590,7 @@ class Mapping:
     def address_exists(self) -> bool:
         test_result = False
         if self.comment_query_type == 'Address':
-            self.comment_adress_exist = self.boolean[int(input('----Does the address exist? \n\n1. Yes \n2. No'))]
+            self.comment_adress_exist = self.boolean[int(input('\n----Does the address exist? \n\n1. Yes \n2. No \n\nAnswer:     '))]
             if self.comment_adress_exist == False:
                 self.address_score = 1
                 self.comment_adress = 'Address does not exist'
@@ -589,8 +604,7 @@ class Mapping:
 
 
     def other_address_issues(self) -> None:
-        self.address_exists()
-        other_address_test = int(input('----Any other issues with the address? \n\n1. Correct with formating \n2. Cant verify \n3. No'))
+        other_address_test = int(input('\n----Any other issues with the address? \n\n1. Correct with formating \n2. Cant verify \n3. No \n\nAnswer:     '))
         str_list = ['', 
                     'Correct with formating', 
                     'Cant verify']
@@ -625,7 +639,7 @@ class Mapping:
 
 
     def missing_pin(self) -> bool:
-        missing_pin_result = self.boolean[int(input('----Is the pin missing? \n\n1. Yes \n2. No '))]
+        missing_pin_result = self.boolean[int(input('\n----Is the pin missing? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         if missing_pin_result:
             self.pin_score = 1
             self.comment_pin = 'Pin missing'
@@ -638,7 +652,7 @@ class Mapping:
             
 
     def simple_roof(self) -> None:
-        single_roof_result = int(input('----Where the pin is bitch? \n\n1. Perfect (Pin on roof) \n2. Approximate (Pin within boundaries) \n3. Next Door (Next to boundaries but not on the other side of the st.) \n4. Wrong (Anything else) \n5. Cant Verify (Blocked but within expected area) '))
+        single_roof_result = int(input('\n----Where the pin is bitch? \n\n1. Perfect (Pin on roof) \n2. Approximate (Pin within boundaries) \n3. Next Door (Next to boundaries but not on the other side of the st.) \n4. Wrong (Anything else) \n5. Cant Verify (Blocked but within expected area) \n\nAnswer:     '))
         str_list = ['Perfect', 
                     'Approximate', 
                     'Next Door',
@@ -663,7 +677,7 @@ class Mapping:
         self.simple_roof()
 
     def complex_roof(self) -> None:
-        multiple_roof_result2 = int(input('----Is the pin within the boundaries? \n\n1. Yes \n2. No \n3. n/a'))
+        multiple_roof_result2 = int(input('\n----Is the pin within the boundaries? \n\n1. Yes \n2. No \n3. n/a \n\nAnswer:     '))
         str_list = ['Perfect',
                     'Wrong',
                     'Cant Verify']
@@ -681,7 +695,7 @@ class Mapping:
         
 
     def multiple_roof(self) -> None:
-        multiple_roof_result = int(input('----Is it a complex or multiple roofs? \n\n1. Complex (Universities, Shopping Malls, etc) \n2. Multiple Roofs (Multiple Buildings) '))
+        multiple_roof_result = int(input('\n----Is it a complex or multiple roofs? \n\n1. Complex (Universities, Shopping Malls, etc) \n2. Multiple Roofs (Multiple Buildings) \n\nAnswer:     '))
         if multiple_roof_result ==1:
             self.complex_roof()
         elif multiple_roof_result ==2:
@@ -689,7 +703,7 @@ class Mapping:
 
 
     def natural_feature(self) -> None:
-        natural_feature_result = int(input('----Where the pin is bitch? \n\n1. Perfect (Pin on roof) \n2. Approximate (Pin within boundaries) \n3. Wrong (Anything else) \n4. Cant Verify (Blocked but within expected area) '))
+        natural_feature_result = int(input('\n----Where the pin is bitch? \n\n1. Perfect (Pin on roof) \n2. Approximate (Pin within boundaries) \n3. Wrong (Anything else) \n4. Cant Verify (Blocked but within expected area) \n\nAnswer:     '))
         str_list = ['Perfect',
                     'Approximate',
                     'Wrong',
@@ -709,7 +723,7 @@ class Mapping:
 
 
     def no_roof(self) -> None:
-        no_roof_result = int(input('----What is it? \n\n1. Streets/Administrative Divisions(Countries or Neighborhoods) \n2. Natural Features '))
+        no_roof_result = int(input('----\nWhat is it? \n\n1. Streets/Administrative Divisions(Countries or Neighborhoods) \n2. Natural Features \n\nAnswer:     '))
         if no_roof_result ==1:
             self.complex_roof()
         elif no_roof_result ==2:
@@ -717,7 +731,7 @@ class Mapping:
 
 
     def transit_POI(self) -> None:
-        transit_result = int(input('----Where the pin is bitch? \n\n1. Perfect (Area you wait for transit) \n2. Approximate (Within 50m) \n3. Wrong (Anything else) \n4. Cant Verify (Blocked but within expected area) '))
+        transit_result = int(input('----\nWhere the pin is bitch? \n\n1. Perfect (Area you wait for transit) \n2. Approximate (Within 50m) \n3. Wrong (Anything else) \n4. Cant Verify (Blocked but within expected area) \n\nAnswer:     '))
         str_list = ['Perfect',
                     'Approximate',
                     'Wrong',
@@ -738,7 +752,7 @@ class Mapping:
 
     def evaluate_pin(self) -> None:
         if self.missing_pin() == False:
-            pin_method = int(input('----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI '))
+            pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
 
             if pin_method == 1:
                 self.single_roof()
@@ -751,15 +765,17 @@ class Mapping:
             elif pin_method == 5:
                 self.transit_POI()
 
+def print_report(comments) -> None:
+    for item in comments:
+        print(item)
 
 def main() -> None:
-    print('Legend\n\n------ Question \n****** Results ')
+    print('\nLegend\n------ Question \n****** Results \n')
 
-    Survey = Mapping
+    Survey = Mapping()
 
     Survey.history.append('-----Set-Up')
     Survey.user_intent()
-    Survey.navigational()
     Survey.all_level_issues()
      
     Survey.history.append(' ')
@@ -777,6 +793,10 @@ def main() -> None:
     Survey.history.append(' ')
     Survey.history.append('-----Pin')
     Survey.evaluate_pin()
+
+    print('\n\n')
+    print('REPORT SUMMARY')
+    print_report(Survey.history)
 
     return Survey
 
