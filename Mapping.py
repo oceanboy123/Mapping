@@ -55,6 +55,7 @@ class Mapping:
         self.category_score = 3
         self.address_score = 3
         self.pin_score = 4
+        self.comment_near = False
 
     def save_comments(self, left_side:str, self_comment:str, reason:str) -> None:
         present_results = left_side+' : '+self_comment+' because '+reason
@@ -113,6 +114,7 @@ class Mapping:
         str_list = ['Ignore User and Viewpoint Location',
                     'User Location']
         
+        self.comment_near =  reason[self.explicit_intent-1] == 'Near me'
         self.comment_location_intent = self.infinite_blank_check(str_list, self.explicit_intent, left_side, reason[self.explicit_intent-1]+' Query')
 
 
@@ -155,7 +157,11 @@ class Mapping:
 
 
     def get_location_intent(self) -> None:
-        self.location_type = int(input('\n----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific) \n\nAnswer:     '))
+        if self.comment_query_type == 'Coordinates or My location':
+            self.location_type = 1
+        else:
+            self.location_type = int(input('\n----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific) \n\nAnswer:     '))
+        
         types = [
             'Explicit',
             'Implicit',
@@ -434,21 +440,38 @@ class Mapping:
         self.comment_relevance = self.Relevance_levels[self.relevance_score]
         self.save_comments(left_side, self.comment_relevance, reason)
 
+    def near_results(self) -> None:
+        self.relevance_type = 'Near Query'
+        near_test = self.boolean[int(input('\n----Is the result within 50m? \n\n1. True \n2. False \n\nAnswer:     '))]
+        if near_test:
+            self.relevance_score = 4
+        else:
+            self.relevance_score = 1
+
+        reason = 'Within or not of 50m'
+
+        left_side = f'{self.relevance_type} Relevance'
+        self.comment_relevance = self.Relevance_levels[self.relevance_score]
+        self.save_comments(left_side, self.comment_relevance, reason)
+
     def relevance_tests(self) -> None:
         self.prominence()
         
-        relevance_method = int(input('\n----Choose Method. Consider the other options, if any, pick based on what will make a difference \n\n1. Many Inside Resusults \n2. Few Outside Results(FOR) \n3. FOR Lenient/Rural \n4. Too Far \n5. User Intent Issues  \n\nAnswer:     '))
+        if self.comment_near == False:
+            relevance_method = int(input('\n----Choose Method. Consider the other options, if any, pick based on what will make a difference \n\n1. Many Inside Resusults \n2. Few Outside Results(FOR) \n3. FOR Lenient/Rural \n4. Too Far \n5. User Intent Issues  \n\nAnswer:     '))
 
-        if relevance_method == 1:
-            self.many_possible_results()
-        elif relevance_method == 2:
-            self.few_possible_results()
-        elif relevance_method == 3:
-            self.FPR_great_distances()
-        elif relevance_method == 4:
-            self.location_user_deviations()
-        elif relevance_method == 5:
-            self.other_types()
+            if relevance_method == 1:
+                self.many_possible_results()
+            elif relevance_method == 2:
+                self.few_possible_results()
+            elif relevance_method == 3:
+                self.FPR_great_distances()
+            elif relevance_method == 4:
+                self.location_user_deviations()
+            elif relevance_method == 5:
+                self.other_types()
+        else:
+            self.near_results()
 
     def evaluate_relevance(self) -> None:
         '''Check for issues related to Relevance and Evaluate Relvance
@@ -759,20 +782,35 @@ class Mapping:
         
         self.comment_pin = self.infinite_blank_check(str_list, transit_result, left_side, reason)
 
+    def near_pin(self) -> None:
+        near_pin_test = self.boolean[int(input('\n----Is the pin within 50m? \n\n1. True \n2. False \n\nAnswer:     '))]
+        if near_pin_test:
+            self.pin_score = 4
+        else:
+            self.pin_score = 1
+
+        reason = 'Within or not of 50m'
+
+        left_side = f'Pin Score'
+        self.comment_pin = self.Pin_levels[self.pin_score]
+        self.save_comments(left_side, self.comment_pin, reason)
 
     def evaluate_pin(self) -> None:
-        pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
-
-        if pin_method == 1:
-            self.single_roof()
-        elif pin_method == 2:
-            self.multiple_roof()
-        elif pin_method == 3:
-            self.natural_feature()
-        elif pin_method == 4:
-            self.no_roof()
-        elif pin_method == 5:
-            self.transit_POI()
+        
+        if self.comment_near == False:
+            pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
+            if pin_method == 1:
+                self.single_roof()
+            elif pin_method == 2:
+                self.multiple_roof()
+            elif pin_method == 3:
+                self.natural_feature()
+            elif pin_method == 4:
+                self.no_roof()
+            elif pin_method == 5:
+                self.transit_POI()
+        else:
+            self.near_pin()
 
 def print_report(comments) -> None:
     print('\n\n')
