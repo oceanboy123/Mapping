@@ -266,7 +266,7 @@ class Mapping:
 
 
     def query_result_connection(self) -> None:
-        result_connection_test_p1 = int(input('\n----Does the connection satisfy intent? \nGeneral, Abbreviation/Alternate, Category, Spell Correction \nTransit, Special Character, Address? \n\n1. Yes \n2. No \n\nAnswer:     '))
+        result_connection_test_p1 = int(input('\n----Does the connection satisfy intent? \nGeneral, Abbreviation/Alternate, Category, Spell Correction \nTransit, Special Character, Address? \n\n1. Yes (Contain Official Name) \n2. No (Does not Contain Official Name) \n\nAnswer:     '))
         left_side = 'Query Connections'
         reason = 'N/A'
 
@@ -295,8 +295,8 @@ class Mapping:
                     self.comment_connection = 'Not Address'
                     reason = 'General, Abbreviation/Alternate, Category, Spell Correction, Transit, or Special Character'
                     self.save_comments(left_side, self.comment_connection, reason)
-            
-            self.comment_connection = 'Address'
+            else:
+                self.comment_connection = 'Address'
 
         else:
             self.comment_connection = 'Not satisfied'
@@ -408,11 +408,6 @@ class Mapping:
         self.lenient_distance()
 
 
-    def rural(self) -> None:
-        self.relevance_type = 'Rural'
-        self.lenient_distance()
-
-
     def location_user_deviations(self) -> None:
         '''Results where the locations are all over the place'''
         self.relevance_type = 'Deviations'
@@ -430,10 +425,10 @@ class Mapping:
         self.save_comments(left_side, self.comment_relevance, reason)
 
     def other_types(self) -> None:
-        self.relevance_type = 'String Relevance'
+        self.relevance_type = 'Intent'
         print(f'Current Relevance Score: {self.relevance_score}')
-        self.relevance_score = int(input('\n----Write score based on relationship between query and result \n\nAnswer:     '))
-        reason = input('----Provide reason')
+        self.relevance_score = int(input('\n----Write score based on relationship between query and result, consider multiple interpretations, # of locatrions and population density \n\nAnswer:     '))
+        reason = 'User intent'
 
         left_side = f'{self.relevance_type} Relevance'
         self.comment_relevance = self.Relevance_levels[self.relevance_score]
@@ -442,7 +437,7 @@ class Mapping:
     def relevance_tests(self) -> None:
         self.prominence()
         
-        relevance_method = int(input('\n----Choose Method \n\n1. Many Resuslts \n2. Few Results(FPR) \n3. FPR and Further \n4. Rural \n5. Deviations in Location \n6. String Issues \n\nAnswer:     '))
+        relevance_method = int(input('\n----Choose Method. Consider the other options, if any, pick based on what will make a difference \n\n1. Many Inside Resusults \n2. Few Outside Results(FOR) \n3. FOR Lenient/Rural \n4. Too Far \n5. User Intent Issues  \n\nAnswer:     '))
 
         if relevance_method == 1:
             self.many_possible_results()
@@ -451,10 +446,8 @@ class Mapping:
         elif relevance_method == 3:
             self.FPR_great_distances()
         elif relevance_method == 4:
-            self.rural()
-        elif relevance_method == 5:
             self.location_user_deviations()
-        elif relevance_method == 6:
+        elif relevance_method == 5:
             self.other_types()
 
     def evaluate_relevance(self) -> None:
@@ -472,8 +465,9 @@ class Mapping:
         self.is_legal()
         self.query_result_connection()
 
+
         # Evaluate Relevance
-        if (self.comment_connection == 'Not Address') | (self.comment_location_specific == 'Implicit'):
+        if(self.comment_connection == 'Not Address') | (self.comment_location_specific == 'Implicit'):
             self.relevance_tests()
 
 
@@ -596,8 +590,8 @@ class Mapping:
 
     def address_exists(self) -> bool:
         test_result = False
+        self.comment_adress_exist = self.boolean[int(input('\n----Does the address exist? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         if self.comment_query_type == 'Address':
-            self.comment_adress_exist = self.boolean[int(input('\n----Does the address exist? \n\n1. Yes \n2. No \n\nAnswer:     '))]
             if self.comment_adress_exist == False:
                 self.address_score = 1
                 self.comment_adress = 'Address does not exist'
@@ -613,6 +607,7 @@ class Mapping:
                 left_side = f'Pin Score'
                 reason = f'of this the Pin Score in {self.Pin_levels[self.pin_score]}'
                 self.save_comments(left_side, self.comment_adress, reason)
+
 
         return test_result
 
@@ -766,21 +761,22 @@ class Mapping:
 
 
     def evaluate_pin(self) -> None:
-        if (self.missing_pin() == False) & (self.comment_adress_exist == True):
-            pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
+        pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
 
-            if pin_method == 1:
-                self.single_roof()
-            elif pin_method == 2:
-                self.multiple_roof()
-            elif pin_method == 3:
-                self.natural_feature()
-            elif pin_method == 4:
-                self.no_roof()
-            elif pin_method == 5:
-                self.transit_POI()
+        if pin_method == 1:
+            self.single_roof()
+        elif pin_method == 2:
+            self.multiple_roof()
+        elif pin_method == 3:
+            self.natural_feature()
+        elif pin_method == 4:
+            self.no_roof()
+        elif pin_method == 5:
+            self.transit_POI()
 
 def print_report(comments) -> None:
+    print('\n\n')
+    print('REPORT SUMMARY')
     for item in comments:
         print(item)
 
@@ -797,20 +793,19 @@ def main() -> None:
     Survey.history.append('-----Relevance')
     Survey.evaluate_relevance()
 
-    Survey.history.append(' ')
-    Survey.history.append('-----Name-Category')
-    Survey.evaluate_name()
+    if Survey.comment_closure == False:
+        Survey.history.append(' ')
+        Survey.history.append('-----Name-Category')
+        Survey.evaluate_name()
 
-    Survey.history.append(' ')
-    Survey.history.append('-----Address')
-    Survey.evaluate_address()
+        Survey.history.append(' ')
+        Survey.history.append('-----Address')
+        Survey.evaluate_address()
+        if (Survey.missing_pin() == False) & (Survey.comment_adress_exist == True):
+            Survey.history.append(' ')
+            Survey.history.append('-----Pin')
+            Survey.evaluate_pin()
 
-    Survey.history.append(' ')
-    Survey.history.append('-----Pin')
-    Survey.evaluate_pin()
-
-    print('\n\n')
-    print('REPORT SUMMARY')
     print_report(Survey.history)
 
     return Survey
