@@ -123,7 +123,7 @@ class Mapping:
                          'Age Missing', 
                          'Missing']
         
-        left_side = f'{viewport_type[self.viewport_type]}' + ' Viewpoint - Location Intent'
+        left_side = f'{viewport_type[self.viewport_type-1]}' + ' Viewpoint - Location Intent'
 
         if self.viewport_type < 3:
             self.user_location = int(input('\n----Select User Location \n\n1. Inside Viewport, \n2. Outside Viewport, \n3. Missing \n\nAnswer:     '))
@@ -156,7 +156,12 @@ class Mapping:
 
     def get_location_intent(self) -> None:
         self.location_type = int(input('\n----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific) \n\nAnswer:     '))
-        
+        types = [
+            'Explicit',
+            'Implicit',
+        ]
+
+        self.comment_location_specific = types[self.location_type-1]
         if self.location_type == 2:
             self.implicit_location()
 
@@ -180,9 +185,9 @@ class Mapping:
 
 
 
-    boolean = ['n/a', True, False]
+    boolean = ['n/a', True, False, 'empty']
     def navigational(self) -> None:
-        self.comment_navigation  = self.boolean[int(input('\n----Is this a Navigational Intent? \nThe intent is unique and clear enough that there is only a single result in the world \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.comment_navigation  = self.boolean[int(input('\n----Is this a Navigational Intent? (Within region if results far from viewpoint)  \nThe intent is unique and clear enough that there is only a single result in the world \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'The intent is unique and clear enough that there is only a single result in the world'
         if self.comment_navigation  == False:
             self.relevance_score = 4
@@ -262,40 +267,41 @@ class Mapping:
 
     def query_result_connection(self) -> None:
         result_connection_test_p1 = int(input('\n----Does the connection satisfy intent? \nGeneral, Abbreviation/Alternate, Category, Spell Correction \nTransit, Special Character, Address? \n\n1. Yes \n2. No \n\nAnswer:     '))
-        conections = ['', 
-                      'Address',
-                      'Not Address']
         left_side = 'Query Connections'
         reason = 'N/A'
 
         if result_connection_test_p1 == 1:
-            result_connection_test_p2 = int(input('\n----Is it address? \n\n1. Yes \n2. No \n\nAnswer:     '))
-            left_side = conections[result_connection_test_p2-1] + ' ' + left_side
             
-            if result_connection_test_p2 == 1:
-                result_connection_test_p3 = int(input('\n----What is missing? \n\n1. Unit Number \n2. Incomplete \n3. Wrong \n4. None \n\nAnswer:     '))
-                str_list = ['Unit Number', 
-                            'Incomplete', 
-                            'Wrong', 
-                            'All good']
-                
-                scores = [3,
-                          2,
-                          1,
-                          self.relevance_score]
-                
-                self.relevance_score = scores[result_connection_test_p3-1]
-                reason = f'of this the Current/Final Relevant Score is {self.Relevance_levels[self.relevance_score]}'
-                self.comment_connection = self.infinite_blank_check(str_list, result_connection_test_p3, left_side, reason)
+            if self.comment_location_specific != 'Implicit':
+                if self.comment_query_type == 'Address':
+                    left_side = 'Address' + ' ' + left_side
+                    result_connection_test_p3 = int(input('\n----Describe the relevance of the address type connection? \n\n1. Unit Number Missing (or within Approximate Boundaries) \n2. Incomplete \n3. Wrong \n4. Good \n\nAnswer:     '))
+                    str_list = ['Unit Number Missing (or well WITHIN approximate boundaries)', 
+                                'Incomplete (or AT approximate boundaries)', 
+                                'Wrong (or UNDERGROUND/ABOVE relevant location)', 
+                                'All good']
+                    
+                    scores = [3,
+                            2,
+                            1,
+                            self.relevance_score]
+                    
+                    self.relevance_score = scores[result_connection_test_p3-1]
+                    reason = f'of this the Current/Final Relevant Score is {self.Relevance_levels[self.relevance_score]}'
+                    self.comment_connection = self.infinite_blank_check(str_list, result_connection_test_p3, left_side, reason)
 
-            else:
-                self.comment_connection = 'Not Address'
-                reason = 'General, Abbreviation/Alternate, Category, Spell Correction, Transit, or Special Character'
-                self.save_comments(left_side, self.comment_connection, reason)
+                else:
+                    left_side = 'No Address' + ' ' + left_side
+                    self.comment_connection = 'Not Address'
+                    reason = 'General, Abbreviation/Alternate, Category, Spell Correction, Transit, or Special Character'
+                    self.save_comments(left_side, self.comment_connection, reason)
+            
+            self.comment_connection = 'Address'
 
         else:
             self.comment_connection = 'Not satisfied'
             self.relevance_score = 1
+            reason = f'of this the Current/Final Relevant Score is {self.Relevance_levels[self.relevance_score]}'
 
             self.save_comments(left_side, self.comment_connection, reason)
 
@@ -392,6 +398,7 @@ class Mapping:
 
         left_side = f'{self.relevance_type} Relevance'
         self.comment_relevance = self.Relevance_levels[self.relevance_score]
+        print('Be strict if distances are great')
         self.save_comments(left_side, self.comment_relevance, 'Lenient diatance Intance')
 
 
@@ -466,7 +473,7 @@ class Mapping:
         self.query_result_connection()
 
         # Evaluate Relevance
-        if self.comment_connection == 'Not Address':
+        if (self.comment_connection == 'Not Address') | (self.comment_location_specific == 'Implicit'):
             self.relevance_tests()
 
 
@@ -545,7 +552,7 @@ class Mapping:
         ---self.comment_name_category---'''
 
         if self.comment_query_type == 'Address':
-            address_name = self.boolean[int(input('\n----Does the address result include a name? \n\n1. Yes \n2. No \n3. n/a \n\nAnswer:     '))]
+            address_name = self.boolean[int(input('\n----Does the ADDRESS result include a name? \n\n1. Yes \n2. No \n\nAnswer:     '))]
             
             if address_name == False:
                 self.name_score = -1
@@ -555,9 +562,9 @@ class Mapping:
                 self.comment_name = self.Accuracy_levels[self.name_score]
                 self.save_comments(left_side, self.comment_name, reason)
             else:
-                self.check_name
+                self.check_name()
         else:
-            self.check_name
+            self.check_name()
 
         self.check_category()
         self.check_combined()
@@ -600,6 +607,13 @@ class Mapping:
                 self.save_comments(left_side, self.comment_adress, reason)
                 test_result = True
 
+                self.pin_score = 0
+                self.comment_pin = 'Address does not exist'
+
+                left_side = f'Pin Score'
+                reason = f'of this the Pin Score in {self.Pin_levels[self.pin_score]}'
+                self.save_comments(left_side, self.comment_adress, reason)
+
         return test_result
 
 
@@ -631,6 +645,7 @@ class Mapping:
         if self.address_exists() == False:
             self.address_components()
             self.other_address_issues()
+
 
 
 
@@ -751,7 +766,7 @@ class Mapping:
 
 
     def evaluate_pin(self) -> None:
-        if self.missing_pin() == False:
+        if (self.missing_pin() == False) & (self.comment_adress_exist == True):
             pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
 
             if pin_method == 1:
