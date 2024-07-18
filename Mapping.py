@@ -47,9 +47,41 @@ class Mapping:
 
 
     def __init__(self) -> None:
-        '''These values represent the best rating
-        for each category, which might be demoted later on'''
+        """These values represent the best rating
+        for each category, which might be demoted later on"""
 
+        self.comment_pin = self.Pin_levels[self.pin_score]
+        self.comment_pin = 'Pin missing'
+        self.comment_adress = 'Address does not exist'
+        self.comment_adress_exist = self.boolean[int(input('\n----Does the address exist? \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.comment_pin = 'Address does not exist'
+        self.comment_components = []
+        self.comment_adress = self.Accuracy_levels[self.address_score]
+        self.comment_name = self.Accuracy_levels[self.name_score]
+        self.comment_name_category = self.Accuracy_levels[self.name_category_score]
+        self.relevance_type = 'Near Query'
+        self.comment_relevance = self.Relevance_levels[self.relevance_score]
+        self.relevance_type = 'Intent'
+        self.comment_relevance = self.Relevance_levels[self.relevance_score]
+        self.relevance_type = 'Deviations'
+        self.comment_relevance = self.Relevance_levels[self.relevance_score]
+        self.relevance_type = 'FPO at Great distances'
+        self.comment_relevance = self.Relevance_levels[self.relevance_score]
+        self.relevance_type = 'Few possible options'
+        self.relevance_type = 'Many possible options'
+        self.comment_prominence = 'No Promotion'
+        self.comment_connection = 'Not satisfied'
+        self.comment_legal = self.boolean[int(input('\n----Is it unexpectedly inappropriate? \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.comment_options = self.boolean[int(input('\n----Are there any better results not shown? \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.comment_closure = self.boolean[int(input('\n----Is the status PERMANENT_CLOSURE? \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.comment_language = self.boolean[int(input('\n----Is the language matching for test_locale, query, and result region? \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.comment_navigation  = self.boolean[int(input('\n----Is this a Navigational Intent? (Within region if results far from viewpoint)  \nThe intent is unique and clear enough that there is only a single result in the world \n\n1. Yes \n2. No \n\nAnswer:     '))]
+        self.location_type = int(input('\n----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific) \n\nAnswer:     '))
+        self.comment_query_type = self.Query_types[self.query_type]
+        self.query_type = int(input('\n----Select Queary Type \n\n1. Address(street number, street name, locality, state, country, and postal code), \n2. Point of Interest(POI), \n3. Business, \n4. Category, \n5. Products and Service, \n6. Coordinates or My location, \n7. Emoji, \n8. No map Intent \n\nAnswer:     '))
+        self.viewport_type = int(input('\n----Select Viewport type \n\n1. Fresh, \n2. Stale, \n3. Age Missing, \n4. Missing \n\nAnswer:     '))
+        self.user_location = int(input('\n----Select User Location \n\n1. Present, \n2. Missing \n\nAnswer:     '))
+        self.explicit_intent = int(input('\n----Select Explicit Intent \n\n1. Specific Location, \n2. Near me \n\nAnswer:     '))
         self.relevance_score = 5
         self.name_score = 3
         self.category_score = 3
@@ -64,7 +96,8 @@ class Mapping:
         print('******'+present_results)
 
     def infinite_blank_check(self, loc_intents:list[str], self_iter, left_side:str, reason:str) -> str:
-        '''In-Progress'''
+        """In-Progress"""
+        global self_comment
         rep = len(loc_intents) + 1
         lap = 1
 
@@ -107,7 +140,6 @@ class Mapping:
 
 
     def explicit_location(self, left_side:str) -> None:
-        self.explicit_intent = int(input('\n----Select Explicit Intent \n\n1. Specific Location, \n2. Near me \n\nAnswer:     '))
         reason = ['Specific Location',
                   'Near me']
 
@@ -119,8 +151,7 @@ class Mapping:
 
 
     def implicit_location(self) -> None:
-        self.viewport_type = int(input('\n----Select Viewport type \n\n1. Fresh, \n2. Stale, \n3. Age Missing, \n4. Missing \n\nAnswer:     '))
-        viewport_type = ['Fresh', 
+        viewport_type = ['Fresh',
                          'Stale', 
                          'Age Missing', 
                          'Missing']
@@ -139,7 +170,6 @@ class Mapping:
                 self.stale_viewport(left_side, reason[self.user_location-1])
 
         else:
-            self.user_location = int(input('\n----Select User Location \n\n1. Present, \n2. Missing \n\nAnswer:     '))
             reason = ['Present',
                       'Missing']
 
@@ -150,8 +180,6 @@ class Mapping:
 
 
     def get_query_type(self) -> None:
-        self.query_type = int(input('\n----Select Queary Type \n\n1. Address(street number, street name, locality, state, country, and postal code), \n2. Point of Interest(POI), \n3. Business, \n4. Category, \n5. Products and Service, \n6. Coordinates or My location, \n7. Emoji, \n8. No map Intent \n\nAnswer:     '))
-        self.comment_query_type = self.Query_types[self.query_type]
         reason = 'N/A'
         self.save_comments('Query Type', self.comment_query_type, reason)
 
@@ -160,7 +188,7 @@ class Mapping:
         if self.comment_query_type == 'Coordinates or My location':
             self.location_type = 1
         else:
-            self.location_type = int(input('\n----Select Location Intent \n\n1. Explicit (Specific), \n2. Implicit (Not Specific) \n\nAnswer:     '))
+            pass
         
         types = [
             'Explicit',
@@ -177,11 +205,11 @@ class Mapping:
 
 
     def user_intent(self) -> None:
-        '''Describe User intent by specifing Query Type and Location Intent
-        Results in: 
-        
+        """Describe User intent by specifing Query Type and Location Intent
+        Results in:
+
         ---self.comment_query_type---,
-        ---self.comment_location_intent---'''
+        ---self.comment_location_intent---"""
         self.get_query_type()
         self.get_location_intent()
 
@@ -193,9 +221,8 @@ class Mapping:
 
     boolean = ['n/a', True, False, 'empty']
     def navigational(self) -> None:
-        self.comment_navigation  = self.boolean[int(input('\n----Is this a Navigational Intent? (Within region if results far from viewpoint)  \nThe intent is unique and clear enough that there is only a single result in the world \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'The intent is unique and clear enough that there is only a single result in the world'
-        if self.comment_navigation  == False:
+        if not self.comment_navigation:
             self.relevance_score = 4
             reason = 'The intent is NOT unique and clear enough that there is only a single result in the world'
 
@@ -203,19 +230,17 @@ class Mapping:
 
 
     def language_test(self) -> None:
-        self.comment_language = self.boolean[int(input('\n----Is the language matching for test_locale, query, and result region? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'N/A'
-        if self.comment_language == False:
+        if not self.comment_language:
             self.address_score = 1
 
         self.save_comments('Language Match', str(self.comment_language), reason)
 
 
     def closure_test(self) -> None:
-        self.comment_closure = self.boolean[int(input('\n----Is the status PERMANENT_CLOSURE? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         if self.comment_closure:
             exp = self.boolean[int(input('\n----Is this result Expected? \nIt completely satisfies user intent or there are no other options? \n\n1. Yes \n2. No \n\nAnswer:     '))]
-            if exp == False:
+            if not exp:
                 self.relevance_score = 2
                 left_side = 'Unexpected PERMANENT_CLOSURE'
                 reason = 'It does not satisfies user intent or there are no other options'
@@ -227,12 +252,12 @@ class Mapping:
 
 
     def all_level_issues(self) -> None:
-        '''Check for issues related to Query or the Results
-        Results in: 
+        """Check for issues related to Query or the Results
+        Results in:
 
-        ---self.comment_navigation---, 
-        ---self.comment_language---, 
-        ---self.comment_closure---'''
+        ---self.comment_navigation---,
+        ---self.comment_language---,
+        ---self.comment_closure---"""
         # Query
         self.navigational()
 
@@ -248,7 +273,6 @@ class Mapping:
 
     
     def no_other_options(self) -> None:
-        self.comment_options = self.boolean[int(input('\n----Are there any better results not shown? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason = 'N/A'
         if self.comment_options:
             demotion_req = self.boolean[int(input('\n----Does it require demotion? \n\n1. Yes \n2. No \n\nAnswer:     '))]
@@ -262,7 +286,6 @@ class Mapping:
 
 
     def is_legal(self) -> None:
-        self.comment_legal = self.boolean[int(input('\n----Is it unexpectedly inappropriate? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         reason ='N/A'
         if self.comment_legal:
             self.relevance_score = 1
@@ -274,7 +297,7 @@ class Mapping:
     def query_result_connection(self) -> None:
         result_connection_test_p1 = int(input('\n----Does the connection satisfy intent? \nGeneral, Abbreviation/Alternate, Category, Spell Correction \nTransit, Special Character, Address? \n\n1. Yes (Contain Official Name) \n2. No (Does not Contain Official Name) \n\nAnswer:     '))
         left_side = 'Query Connections'
-        reason = 'N/A'
+        'N/A'
 
         if result_connection_test_p1 == 1:
             
@@ -305,7 +328,6 @@ class Mapping:
                 self.comment_connection = 'Address'
 
         else:
-            self.comment_connection = 'Not satisfied'
             self.relevance_score = 1
             reason = f'of this the Current/Final Relevant Score is {self.Relevance_levels[self.relevance_score]}'
 
@@ -318,7 +340,7 @@ class Mapping:
             self.comment_prominence = 'International'
             self.relevance_score = 3
         else:
-            self.comment_prominence = 'No Promotion'
+            pass
 
         left_side = 'Prominence Promotion'
         reason = 'N/A'
@@ -346,9 +368,8 @@ class Mapping:
 
 
     def many_possible_results(self) -> None:
-        '''Many results that could satisfy the user'''
+        """Many results that could satisfy the user"""
 
-        self.relevance_type = 'Many possible options'
         if self.user_location == 1:
             result_many_test = int(input('\n----How far is the location from user? \n\n1. Near/In \n2. Near-ish/In \n3. Far/In \n4. Near/Out \n5. Far/Out \n\nAnswer:     '))
             str_list = ['Near/In', 
@@ -391,8 +412,7 @@ class Mapping:
 
     
     def few_possible_results(self) -> None:
-        '''Fewer number of locations'''
-        self.relevance_type = 'Few possible options'
+        """Fewer number of locations"""
         self.distance()
 
 
@@ -403,22 +423,20 @@ class Mapping:
             self.relevance_score = 2
 
         left_side = f'{self.relevance_type} Relevance'
-        self.comment_relevance = self.Relevance_levels[self.relevance_score]
         print('Be strict if distances are great')
         self.save_comments(left_side, self.comment_relevance, 'Lenient diatance Intance')
 
 
     def FPR_great_distances(self) -> None:
-        '''Fewer number of locations at great distances'''
-        self.relevance_type = 'FPO at Great distances'
+        """Fewer number of locations at great distances"""
         self.lenient_distance()
 
 
     def location_user_deviations(self) -> None:
-        '''Results where the locations are all over the place'''
-        self.relevance_type = 'Deviations'
+        """Results where the locations are all over the place"""
+        global reason
 
-        if self.navigational == False:
+        if not self.navigational:
             result_deviation_test = int(input('\n----Is the location in the viewport, and near the user? \n\n1. Yes \n2. No \n\nAnswer:     '))
             if result_deviation_test == 1:
                 reason = 'It is in the viewport, and near the user'
@@ -427,21 +445,17 @@ class Mapping:
                 reason = 'Not in the viewport, and near the user'
         
         left_side = f'{self.relevance_type} Relevance'
-        self.comment_relevance = self.Relevance_levels[self.relevance_score]
         self.save_comments(left_side, self.comment_relevance, reason)
 
     def other_types(self) -> None:
-        self.relevance_type = 'Intent'
         print(f'Current Relevance Score: {self.relevance_score}')
         self.relevance_score = int(input('\n----Write score based on relationship between query and result, consider multiple interpretations, # of locatrions and population density \n\nAnswer:     '))
         reason = 'User intent'
 
         left_side = f'{self.relevance_type} Relevance'
-        self.comment_relevance = self.Relevance_levels[self.relevance_score]
         self.save_comments(left_side, self.comment_relevance, reason)
 
     def near_results(self) -> None:
-        self.relevance_type = 'Near Query'
         near_test = self.boolean[int(input('\n----Is the result within 50m? \n\n1. True \n2. False \n\nAnswer:     '))]
         if near_test:
             self.relevance_score = 4
@@ -451,13 +465,12 @@ class Mapping:
         reason = 'Within or not of 50m'
 
         left_side = f'{self.relevance_type} Relevance'
-        self.comment_relevance = self.Relevance_levels[self.relevance_score]
         self.save_comments(left_side, self.comment_relevance, reason)
 
     def relevance_tests(self) -> None:
         self.prominence()
         
-        if self.comment_near == False:
+        if not self.comment_near:
             relevance_method = int(input('\n----Choose Method. Consider the other options, if any, pick based on what will make a difference \n\n1. Many Inside Resusults \n2. Few Outside Results(FOR) \n3. FOR Lenient/Rural \n4. Too Far \n5. User Intent Issues  \n\nAnswer:     '))
 
             if relevance_method == 1:
@@ -474,14 +487,14 @@ class Mapping:
             self.near_results()
 
     def evaluate_relevance(self) -> None:
-        '''Check for issues related to Relevance and Evaluate Relvance
+        """Check for issues related to Relevance and Evaluate Relvance
 
         Results in:
-        ---self.comment_relevance---, 
-        ---self.relevance_score---, 
-        ---self.comment_prominence---, 
+        ---self.comment_relevance---,
+        ---self.relevance_score---,
+        ---self.comment_prominence---,
         ---self.comment_connection---,
-        ---self.comment_legal---'''
+        ---self.comment_legal---"""
 
         # Relevance Issues
         self.no_other_options()
@@ -548,35 +561,33 @@ class Mapping:
             self.name_category_score = 3
         elif (ns == 2 & cs == 3) | (ns == 2 & cs == -1):
             self.name_category_score = 2
-        elif (ns == 3 & cs == -1):
+        elif ns == 3 & cs == -1:
             self.name_category_score = -1
         else:
             self.name_category_score = int(input(f'\n----Name = {ns}, Category = {cs}. What is the score then? \n\nAnswer:     '))
 
         left_side = f'Combined Name-Category Rating'
-        self.comment_name_category = self.Accuracy_levels[self.name_category_score]
         reason = f'of this Name-Category Score is {self.category_score}'
 
         self.save_comments(left_side, self.comment_name_category, reason)
 
 
     def evaluate_name(self) -> None:
-        '''Check for Name, Category and Combined scores
+        """Check for Name, Category and Combined scores
 
         Results in:
-        ---self.comment_name---, 
-        ---self.comment_category---, 
-        ---self.comment_name_category---'''
+        ---self.comment_name---,
+        ---self.comment_category---,
+        ---self.comment_name_category---"""
 
         if self.comment_query_type == 'Address':
             address_name = self.boolean[int(input('\n----Does the ADDRESS result include a name? \n\n1. Yes \n2. No \n\nAnswer:     '))]
             
-            if address_name == False:
+            if not address_name:
                 self.name_score = -1
 
                 left_side = f'Name Rating'
                 reason = 'Query Type is Address'
-                self.comment_name = self.Accuracy_levels[self.name_score]
                 self.save_comments(left_side, self.comment_name, reason)
             else:
                 self.check_name()
@@ -593,7 +604,6 @@ class Mapping:
 
 
     def address_components(self) -> None:
-        self.comment_components = []
         selection = int(input('\n----Check for the following address components based on result address \n\n1. Street #/Extensions/Ranges \n2. Unit/Apt \n3. St. Name/Alternate/Directions/Type \n4. Sub-locality \n5. Reggion/State \n6. Postal Code \n7. Country \n8. Exit \n\nAnswer:     '))
         issues = ['Street #/Extensions/Ranges','Unit/Apt', 'St. Name/Alternate/Directions/Type' ,'Sub-locality' ,'Reggion/State' ,'Postal Code' ,'Country']
         while selection != 8:
@@ -607,17 +617,14 @@ class Mapping:
 
         left_side = f'Address Score'
         reason = f'there are issues with {self.comment_components}'
-        self.comment_adress = self.Accuracy_levels[self.address_score]
         self.save_comments(left_side, self.comment_adress, reason)
 
 
     def address_exists(self) -> bool:
         test_result = False
-        self.comment_adress_exist = self.boolean[int(input('\n----Does the address exist? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         if self.comment_query_type == 'Address':
-            if self.comment_adress_exist == False:
+            if not self.comment_adress_exist:
                 self.address_score = 1
-                self.comment_adress = 'Address does not exist'
 
                 left_side = f'Address Score'
                 reason = f'of this the Address Score in {self.address_score}'
@@ -625,7 +632,6 @@ class Mapping:
                 test_result = True
 
                 self.pin_score = 0
-                self.comment_pin = 'Address does not exist'
 
                 left_side = f'Pin Score'
                 reason = f'of this the Pin Score in {self.Pin_levels[self.pin_score]}'
@@ -654,13 +660,13 @@ class Mapping:
 
 
     def evaluate_address(self) -> None:
-        '''Check the Address
+        """Check the Address
 
         Results in:
-        ---self.comment_address ---, 
-        ---self.comment_adress_exist---'''
+        ---self.comment_address ---,
+        ---self.comment_adress_exist---"""
 
-        if self.address_exists() == False:
+        if not self.address_exists():
             self.address_components()
             self.other_address_issues()
 
@@ -675,7 +681,6 @@ class Mapping:
         missing_pin_result = self.boolean[int(input('\n----Is the pin missing? \n\n1. Yes \n2. No \n\nAnswer:     '))]
         if missing_pin_result:
             self.pin_score = 1
-            self.comment_pin = 'Pin missing'
 
             left_side = f'Missing Pin'
             reason = f'of this Pin Score is {self.pin_score}'
@@ -792,12 +797,11 @@ class Mapping:
         reason = 'Within or not of 50m'
 
         left_side = f'Pin Score'
-        self.comment_pin = self.Pin_levels[self.pin_score]
         self.save_comments(left_side, self.comment_pin, reason)
 
     def evaluate_pin(self) -> None:
         
-        if self.comment_near == False:
+        if not self.comment_near:
             pin_method = int(input('\n----Choose Method \n\n1. Single Roof \n2. Multiple Roof \n3. Natural Features \n4. No roof \n5. Transit POI \n\nAnswer:     '))
             if pin_method == 1:
                 self.single_roof()
@@ -831,7 +835,7 @@ def main() -> None:
     Survey.history.append('-----Relevance')
     Survey.evaluate_relevance()
 
-    if Survey.comment_closure == False:
+    if not Survey.comment_closure:
         Survey.history.append(' ')
         Survey.history.append('-----Name-Category')
         Survey.evaluate_name()
@@ -849,5 +853,5 @@ def main() -> None:
     return Survey
 
 if __name__ == '__main__':
-    Survey = main()
+    main()
         
