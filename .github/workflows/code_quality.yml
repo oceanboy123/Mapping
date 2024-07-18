@@ -27,4 +27,4 @@ jobs:
           pr-mode: false
           push-fixes: pull-request
         env:
-          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MAPS }}
+          QODANA_TOKEN: ${{ secrets.QODANA_TOKEN_MAPS}}
